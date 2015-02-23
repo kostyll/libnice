@@ -1003,7 +1003,7 @@ nice_agent_class_init (NiceAgentClass *klass)
   nice_debug_init ();
 }
 
-static void priv_generate_tie_breaker (NiceAgent *agent) 
+static void priv_generate_tie_breaker (NiceAgent *agent)
 {
   nice_rng_generate_bytes (agent->rng, 8, (gchar*)&agent->tie_breaker);
 }
@@ -3138,6 +3138,33 @@ nice_agent_set_remote_credentials (
   return ret;
 }
 
+NICEAPI_EXPORT gboolean
+nice_agent_set_local_credentials (
+  NiceAgent *agent,
+  guint stream_id,
+  const gchar *ufrag, const gchar *pwd)
+{
+  Stream *stream;
+  gboolean ret = FALSE;
+
+  agent_lock();
+
+  stream = agent_find_stream (agent, stream_id);
+  /* note: oddly enough, ufrag and pwd can be empty strings */
+  if (stream && ufrag && pwd) {
+
+    g_strlcpy (stream->local_ufrag, ufrag, NICE_STREAM_MAX_UFRAG);
+    g_strlcpy (stream->local_password, pwd, NICE_STREAM_MAX_PWD);
+
+    ret = TRUE;
+    goto done;
+  }
+
+ done:
+  agent_unlock_and_emit (agent);
+  return ret;
+}
+
 
 NICEAPI_EXPORT gboolean
 nice_agent_get_local_credentials (
@@ -4540,7 +4567,7 @@ nice_agent_restart (
   for (i = agent->streams; i; i = i->next) {
     Stream *stream = i->data;
 
-    /* step: reset local credentials for the stream and 
+    /* step: reset local credentials for the stream and
      * clean up the list of remote candidates */
     stream_restart (agent, stream);
   }

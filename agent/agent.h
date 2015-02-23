@@ -592,6 +592,25 @@ nice_agent_set_remote_credentials (
   const gchar *ufrag, const gchar *pwd);
 
 
+/**
+ * nice_agent_set_local_credentials:
+ * @agent: The #NiceAgent Object
+ * @stream_id: The ID of the stream
+ * @ufrag: NULL-terminated string containing an ICE username fragment
+ *    (length must be between 22 and 256 chars)
+ * @pwd: NULL-terminated string containing an ICE password
+ *    (length must be between 4 and 256 chars)
+ *
+ * Sets the local credentials for stream @stream_id.
+ *
+ * Returns: %TRUE on success, %FALSE on error.
+ */
+gboolean
+nice_agent_set_local_credentials (
+  NiceAgent *agent,
+  guint stream_id,
+  const gchar *ufrag, const gchar *pwd);
+
 
 /**
  * nice_agent_get_local_credentials:
@@ -1530,4 +1549,3 @@ nice_agent_get_component_state (NiceAgent *agent,
 G_END_DECLS
 
 #endif /* _AGENT_H */
-
